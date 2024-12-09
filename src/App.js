@@ -3,12 +3,12 @@ import './App.css';
 import VideoCard from './components/VideoCard';
 import BottomNavbar from './components/BottomNavbar';
 import TopNavbar from './components/TopNavbar';
-import okarun from './profilePic/okarun_revised.jpg';
+
 // This array holds information about different videos
 const videoUrls = [
   {
     url: require('./videos/video1.mp4'),
-    profilePic: okarun,
+    profilePic: 'https://gravatar.com/avatar/6dc0cf827604b2ae9a9dfef1e5d5c25e?s=400&d=robohash&r=x',
     username: 'csjackie',
     description: 'Lol nvm #compsci #chatgpt #ai #openai #techtok',
     song: 'Original sound - Famed Flames',
@@ -19,7 +19,7 @@ const videoUrls = [
   },
   {
     url: require('./videos/video2.mp4'),
-    profilePic: okarun,
+    profilePic: 'https://gravatar.com/avatar/6dc0cf827604b2ae9a9dfef1e5d5c25e?s=400&d=robohash&r=x',
     username: 'dailydotdev',
     description: 'Every developer brain @francesco.ciulla #developerjokes #programming #programminghumor #programmingmemes',
     song: 'tarawarolin wants you to know this isnt my sound - Chaplain J Rob',
@@ -30,7 +30,7 @@ const videoUrls = [
   },
   {
     url: require('./videos/video3.mp4'),
-    profilePic: okarun,
+    profilePic: 'https://gravatar.com/avatar/6dc0cf827604b2ae9a9dfef1e5d5c25e?s=400&d=robohash&r=x',
     username: 'wojciechtrefon',
     description: '#programming #softwareengineer #vscode #programmerhumor #programmingmemes',
     song: 'help so many people are using my sound - Ezra',
@@ -41,7 +41,7 @@ const videoUrls = [
   },
   {
     url: require('./videos/video4.mp4'),
-    profilePic: okarun,
+    profilePic: 'https://gravatar.com/avatar/6dc0cf827604b2ae9a9dfef1e5d5c25e?s=400&d=robohash&r=x',
     username: 'faruktutkus',
     description: 'Wait for the end | Im RTX 4090 TI | #softwareengineer #softwareengineer #coding #codinglife #codingmemes ',
     song: 'orijinal ses - Computer Science',
