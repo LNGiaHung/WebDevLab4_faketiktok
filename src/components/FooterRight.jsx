@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faCircleCheck, faHeart, faCommentDots, faBookmark, faShare, faVolumeMute, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 import './FooterRight.css';
 
-function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteClick, isMuted  }) {
+function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteClick, isMuted, videoUrl  }) {
   //like and save state
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -98,11 +98,36 @@ function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteCli
           <FontAwesomeIcon 
             icon = {faBookmark}
             style = {{width: '35px', height: '35px', color: 'white'}}
-            onClick = {() => setSaved(true)}
+            onClick = {async () => {
+              try {
+                // Create a temporary input element
+                const tempInput = document.createElement('input');
+                tempInput.value = videoUrl;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                
+                // Try to copy using document.execCommand as fallback
+                const success = document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                if (!success) {
+                  // If execCommand fails, try clipboard API
+                  await navigator.clipboard.writeText(videoUrl);
+                }
+                
+                alert('Video URL copied to clipboard!');
+                setSaved(true);
+              } catch (err) {
+                console.error('Failed to copy URL:', err);
+                // Show the URL in the alert if copying fails
+                alert(`Could not copy automatically. Here's the URL to copy manually:\n${videoUrl}`);
+                setSaved(true);
+              }
+            }}
           />
         )}
 
-        <p>{saves ? saves + 1 : saves}</p>
+        <p>{saved ? saves + 1 : saves}</p>
       </div>
 
       <div className = "sidebar-icon">
