@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faCircleCheck, faHeart, faCommentDots, faBookmark, faShare, faVolumeMute, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
+import SharePopup from './SharePopup';
 import './FooterRight.css';
 
 function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteClick, isMuted, videoUrl  }) {
@@ -8,6 +9,7 @@ function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteCli
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [userAddIcon, setUserAddIcon] = useState(faCirclePlus);
+  const [showShare, setShowShare] = useState(false);
 
   const handleUserAddClick = () => {
     setUserAddIcon(faCircleCheck);
@@ -134,8 +136,10 @@ function FooterRight({ likes, comments, saves, shares, profilePic, handleMuteCli
         <FontAwesomeIcon 
           icon = {faShare}
           style = {{width: '35px', height: '35px', color: 'white'}}
+          onClick={() => setShowShare(!showShare)}
         />
         <p>{shares}</p>
+        <SharePopup isOpen={showShare} onClose={() => setShowShare(false)} />
       </div>
 
       <div className = "sidebar-icon">
