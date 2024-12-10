@@ -16,8 +16,8 @@ html {
   height: 667px;
   width: 375px;
   border-radius: 25px;
-  overflow: scroll;
-  scroll-snap-type: y mandatory;
+  overflow: hidden;
+  background-color: #000;
 }
 
 .container::-webkit-scrollbar {
@@ -124,4 +124,20 @@ html {
   font-size: 7px;
   padding: 5px;
   border-radius: 50%;
+}
+
+.no-results {
+  height: calc(100% - 95px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.no-results h3 {
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.8;
 }

@@ -54,76 +54,111 @@ const videoUrls = [
 
 function App() {
   const [videos, setVideos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const videoRefs = useRef([]);
 
+  // Initial load of videos
   useEffect(() => {
     setVideos(videoUrls);
   }, []);
+
+  // Handle search functionality
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    
+    // If search term is empty (including when closing search), show all videos
+    if (!term || term.trim() === '') {
+      setVideos(videoUrls);
+      return;
+    }
+
+    // Remove # if present at the start
+    const searchQuery = term.startsWith('#') ? term.slice(1) : term;
+    
+    // Filter videos that have matching hashtags
+    const filteredVideos = videoUrls.filter(video => {
+      const hashtags = video.description.toLowerCase().match(/#\w+/g) || [];
+      return hashtags.some(hashtag => 
+        hashtag.slice(1).includes(searchQuery.toLowerCase())
+      );
+    });
+
+    setVideos(filteredVideos);
+  };
 
   useEffect(() => {
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.8, // Adjust this value to change the scroll trigger point
+      threshold: 0.8,
     };
 
-    // This function handles the intersection of videos
     const handleIntersection = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const videoElement = entry.target;
-          videoElement.play();
+          entry.target.play().catch(error => {
+            console.log("Video play failed:", error);
+          });
         } else {
-          const videoElement = entry.target;
-          videoElement.pause();
+          entry.target.pause();
         }
       });
     };
 
     const observer = new IntersectionObserver(handleIntersection, observerOptions);
 
-    // We observe each video reference to trigger play/pause
-    videoRefs.current.forEach((videoRef) => {
-      observer.observe(videoRef);
+    // Clean up old observers
+    videoRefs.current.forEach(ref => {
+      if (ref) observer.unobserve(ref);
     });
 
-    // We disconnect the observer when the component is unmounted
+    // Set up new observers
+    videoRefs.current = videoRefs.current.slice(0, videos.length);
+    videoRefs.current.forEach(ref => {
+      if (ref) observer.observe(ref);
+    });
+
     return () => {
       observer.disconnect();
     };
   }, [videos]);
 
-  // This function handles the reference of each video
   const handleVideoRef = (index) => (ref) => {
-    videoRefs.current[index] = ref;
+    if (ref) {
+      videoRefs.current[index] = ref;
+    }
   };
 
   return (
     <div className="app">
       <div className="container">
-        <TopNavbar className="top-navbar" />
-        {/* Here we map over the videos array and create VideoCard components */}
-        {videos.map((video, index) => (
-          <VideoCard
-            key={index}
-            username={video.username}
-            description={video.description}
-            song={video.song}
-            likes={video.likes}
-            saves={video.saves}
-            comments={video.comments}
-            shares={video.shares}
-            url={video.url}
-            profilePic={video.profilePic}
-            setVideoRef={handleVideoRef(index)}
-            autoplay={index === 0}
-          />
-        ))}
-        <BottomNavbar className="bottom-navbar" />
+        <TopNavbar onSearch={handleSearch} />
+        {videos.length > 0 ? (
+          videos.map((video, index) => (
+            <VideoCard
+              key={video.url}
+              username={video.username}
+              description={video.description}
+              song={video.song}
+              likes={video.likes}
+              saves={video.saves}
+              comments={video.comments}
+              shares={video.shares}
+              url={video.url}
+              profilePic={video.profilePic}
+              setVideoRef={handleVideoRef(index)}
+              autoplay={index === 0}
+            />
+          ))
+        ) : (
+          <div className="no-results">
+            <h3>No videos found with #{searchTerm}</h3>
+          </div>
+        )}
+        <BottomNavbar />
       </div>
     </div>
   );
-  
 }
 
 export default App;
