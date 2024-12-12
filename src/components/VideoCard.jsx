@@ -1,19 +1,21 @@
 import React, { useRef, useEffect, useState } from 'react';
 import FooterLeft from './FooterLeft';
 import FooterRight from './FooterRight';
+import VideoInfo from './VideoInfo';
 import './VideoCard.css';
 
 const VideoCard = (props) => {
-  const {url, username, description, song, likes, shares, comments, saves, profilePic, setVideoRef, autoplay } = props;
+  const { url, username, description, song, likes, shares, comments, saves, profilePic, setVideoRef, autoplay } = props;
   const videoRef = useRef(null);
-  const [isMuted, setIsMuted] = useState(true); // Start muted
+  const [isMuted, setIsMuted] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.muted = true; // Ensure video starts muted
+      videoRef.current.muted = true;
       if (autoplay && hasInteracted) {
         videoRef.current.play().catch(error => {
           console.log("Playback failed:", error);
@@ -22,8 +24,30 @@ const VideoCard = (props) => {
     }
   }, [autoplay, hasInteracted]);
 
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'ArrowRight' && !showInfo) {
+        setShowInfo(true);
+      } else if (e.key === 'ArrowLeft' && showInfo) {
+        setShowInfo(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showInfo]);
+
+  useEffect(() => {
+    const handleCloseAll = () => {
+      setShowInfo(false);
+    };
+
+    window.addEventListener('closeAllVideoInfo', handleCloseAll);
+    return () => window.removeEventListener('closeAllVideoInfo', handleCloseAll);
+  }, []);
+
   const onVideoPress = () => {
-    if (!isDragging) {
+    if (!isDragging && !showInfo) {
       setHasInteracted(true);
       if (videoRef.current.paused) {
         videoRef.current.play().catch(error => {
@@ -36,19 +60,21 @@ const VideoCard = (props) => {
   };
 
   const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartY(e.clientY);
-    setHasInteracted(true);
+    if (!showInfo) {
+      setIsDragging(true);
+      setStartY(e.clientY);
+      setHasInteracted(true);
+    }
   };
 
   const handleMouseMove = (e) => {
-    if (isDragging) {
+    if (isDragging && !showInfo) {
       const deltaY = e.clientY - startY;
       if (Math.abs(deltaY) > 50) {
         const container = document.querySelector('.container');
         const currentScroll = container.scrollTop;
         const videoHeight = container.clientHeight;
-        
+
         if (deltaY > 0) {
           container.scrollTo({
             top: currentScroll - videoHeight,
@@ -72,11 +98,15 @@ const VideoCard = (props) => {
   const handleMuteClick = () => {
     setIsMuted((prevMute) => {
       const muteStatus = !prevMute;
-      if(videoRef.current) {
+      if (videoRef.current) {
         videoRef.current.muted = muteStatus;
       }
       return muteStatus;
     });
+  };
+
+  const handleCloseInfo = () => {
+    setShowInfo(false);
   };
 
   return (
@@ -85,9 +115,9 @@ const VideoCard = (props) => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}>
-      <video 
-        className="player" 
-        onClick={onVideoPress} 
+      <video
+        className="player"
+        onClick={onVideoPress}
         ref={(ref) => {
           videoRef.current = ref;
           setVideoRef(ref);
@@ -99,14 +129,14 @@ const VideoCard = (props) => {
       ></video>
       <div className="bottom-controls">
         <div className="footer-left">
-          <FooterLeft 
+          <FooterLeft
             username={username}
             description={description}
             song={song}
           />
         </div>
         <div className="footer-right">
-          <FooterRight 
+          <FooterRight
             likes={likes}
             shares={shares}
             comments={comments}
@@ -118,6 +148,18 @@ const VideoCard = (props) => {
           />
         </div>
       </div>
+      <VideoInfo
+        isVisible={showInfo}
+        videoData={{
+          username,
+          description,
+          likes,
+          comments,
+          shares,
+          profilePic
+        }}
+        onClose={handleCloseInfo}
+      />
     </div>
   );
 };
